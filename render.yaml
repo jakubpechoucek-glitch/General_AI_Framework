@@ -15,10 +15,12 @@ services:
         value: "1"
       - key: SECRET_KEY
         generateValue: true
+      # First admin: sign in with this email and the generated password shown on the
+      # service's Environment page in the Render dashboard (must be changed at first sign-in).
       - key: ADMIN_EMAIL
-        sync: false
+        value: admin@ksc.local
       - key: ADMIN_PASSWORD
-        sync: false
+        generateValue: true
       - key: DATABASE_URL
         fromDatabase:
           name: ai-ksc-db
