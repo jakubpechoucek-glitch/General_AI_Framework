@@ -25,5 +25,8 @@ services:
           property: connectionString
 databases:
   - name: ai-ksc-db
+    databaseName: ai_ksc_db
+    user: ai_ksc_db_user
     region: frankfurt
     plan: free
+    postgresMajorVersion: "17"
