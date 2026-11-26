@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+.env
+# Local database and organisation data: never commit
+data/*
+!data/.gitkeep
+*.db
+*.xlsx

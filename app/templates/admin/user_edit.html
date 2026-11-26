@@ -1,0 +1,17 @@
+{% extends "base.html" %}{% block title %}Employee{% endblock %}
+{% block content %}<h1>{{ user.name if user else 'New employee' }}</h1>{% include "admin/_nav.html" %}
+<div class="card"><form method="post" action="/admin/users/{{ user.id if user else 'new' }}">
+<div class="form-row"><div><label for="eid">Employee ID</label><input id="eid" type="text" name="employee_id" value="{{ user.employee_id if user }}" required></div>
+<div><label for="nm">Name</label><input id="nm" type="text" name="name" value="{{ user.name if user }}" required></div>
+<div><label for="em">Email</label><input id="em" type="email" name="email" value="{{ user.email if user }}" required></div></div>
+<div class="form-row"><div><label for="tm">Team</label><select id="tm" name="team_id"><option value="">—</option>{% for t in teams %}<option value="{{ t.id }}" {{ 'selected' if user and user.team_id == t.id }}>{{ t.name }}</option>{% endfor %}</select></div>
+<div><label for="rl">Role</label><select id="rl" name="role_id"><option value="">—</option>{% for r in roles %}<option value="{{ r.id }}" data-team="{{ r.team_id }}" {{ 'selected' if user and user.role_id == r.id }}>{{ r.title }} ({{ r.team.name }})</option>{% endfor %}</select></div>
+<div><label for="mg">Manager</label><select id="mg" name="manager_id"><option value="">—</option>{% for m in managers if not user or m.id != user.id %}<option value="{{ m.id }}" {{ 'selected' if user and user.manager_id == m.id }}>{{ m.name }} · {{ m.email }}</option>{% endfor %}</select></div></div>
+<div class="actions"><label class="inline"><input type="checkbox" name="is_admin" {{ 'checked' if user and user.is_admin }}> Administrator</label>
+<label class="inline"><input type="checkbox" name="is_calibrator" {{ 'checked' if user and user.is_calibrator }}> Calibration owner for the team</label>
+<label class="inline"><input type="checkbox" name="active" {{ 'checked' if not user or user.active }}> Active</label></div>
+<div class="actions"><button class="btn" name="action" value="save">Save</button><a class="btn secondary" href="/admin/users">Cancel</a>
+{% if user %}<button class="btn secondary" name="action" value="reset" formnovalidate>Generate temporary password</button>{% endif %}</div>
+<p class="small muted">Deactivate instead of deleting so that assessment history is kept. A changed role applies to the next assessment; open drafts keep the role they started with.</p>
+</form></div>
+{% endblock %}

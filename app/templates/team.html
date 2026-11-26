@@ -1,0 +1,19 @@
+{% extends "base.html" %}{% from "macros.html" import wf %}{% block title %}Team reviews{% endblock %}
+{% block content %}
+<div class="section-head"><h1>Team reviews</h1>
+<form method="get" class="actions" style="margin:0"><select name="cycle_id" onchange="this.form.submit()" aria-label="Cycle">
+{% for c in cycles %}<option value="{{ c.id }}" {{ 'selected' if cycle and c.id == cycle.id }}>{{ c.name }}{{ ' (active)' if c.active }}</option>{% endfor %}</select></form></div>
+<div class="table-wrap"><table>
+<tr><th>Employee</th><th>Role</th><th>Manager</th><th>Status</th><th>Submitted</th><th class="num">Completion</th><th class="num">Meets</th><th class="num">Gap 1</th><th class="num">Gap 2+</th><th></th></tr>
+{% for e in data %}{% set a = e.assessment %}{% set s = e.summary %}
+<tr><td>{{ e.user.name }}<br><span class="small muted">{{ e.user.employee_id }}</span></td>
+<td>{{ e.user.role.title if e.user.role else '—' }}{% if e.user.role and not e.user.role.is_validated %}<br><span class="small muted">requirements not validated</span>{% endif %}</td>
+<td class="small">{{ e.user.manager.name if e.user.manager else '—' }}</td>
+<td>{{ wf(a.status) if a else '<span class="muted">Not started</span>'|safe }}</td>
+<td class="small">{{ a.assessment_date|dt if a else '—' }}</td>
+<td class="num">{{ s.completion|pct if s else '—' }}</td><td class="num">{{ s.meets if s else '—' }}</td><td class="num">{{ s.gap1 if s else '—' }}</td><td class="num">{{ s.gap2 if s else '—' }}</td>
+<td>{% if a and a.status != 'Draft' %}<a class="btn small{{ ' secondary' if a.status == 'Finalized' }}" href="/review/{{ a.id }}">{{ 'Review' if a.status in ['Submitted','Manager Review'] else 'Calibrate' if a.status == 'Calibration' else 'Open' }}</a>{% elif a %}<span class="small muted">in progress</span>{% endif %}</td></tr>
+{% endfor %}
+</table></div>
+<p class="small muted">Gap figures appear once an assessment is finalised (official gaps use the validated level only).</p>
+{% endblock %}

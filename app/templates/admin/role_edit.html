@@ -1,0 +1,16 @@
+{% extends "base.html" %}{% block title %}{{ role.title }}{% endblock %}
+{% block content %}<h1>{{ role.title }}</h1><p class="muted">{{ role.team.name }}</p>{% include "admin/_nav.html" %}
+<div class="card"><form method="post" action="/admin/roles/{{ role.id }}">
+<div class="form-row"><div><label for="f">Role family</label><input id="f" type="text" name="family" value="{{ role.family }}"></div>
+<div><label for="t">Role title</label><input id="t" type="text" name="title" value="{{ role.title }}"></div></div>
+<div class="form-row"><div><label for="vs">Validation status</label><select id="vs" name="validation_status">{% for s in statuses %}<option {{ 'selected' if role.validation_status == s }}>{{ s }}</option>{% endfor %}{% if role.validation_status not in statuses %}<option selected>{{ role.validation_status }}</option>{% endif %}</select></div>
+<div><label for="vb">Validated by</label><input id="vb" type="text" name="validated_by" value="{{ role.validated_by }}" placeholder="Manager / forum that approved the levels"></div>
+<div><label>Validated on</label><input type="text" value="{{ role.validated_on or '—' }}" disabled></div></div>
+<label for="ra">Proposal rationale / assumptions</label><textarea id="ra" name="rationale">{{ role.rationale }}</textarea>
+<label for="rc">Reviewer / role-owner comments</label><textarea id="rc" name="reviewer_comment">{{ role.reviewer_comment }}</textarea>
+<div class="actions"><label class="inline"><input type="checkbox" name="active" {{ 'checked' if role.active }}> Active</label>
+<button class="btn" name="action" value="save">Save</button><a class="btn secondary" href="/admin/teams/{{ role.team_id }}#matrix">Back to matrix</a>
+<button class="btn danger" name="action" value="delete" data-confirm="Delete this role?">Delete</button></div></form></div>
+<h2>Employees in this role ({{ holders|length }})</h2>
+<ul>{% for u in holders %}<li><a href="/admin/users/{{ u.id }}">{{ u.name }}</a> · {{ u.email }}</li>{% else %}<li class="muted">None</li>{% endfor %}</ul>
+{% endblock %}

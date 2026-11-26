@@ -1,0 +1,61 @@
+{% extends "base.html" %}{% block title %}Self-assessment{% endblock %}
+{% block content %}
+<div class="section-head">
+  <div><h1>Self-assessment · {{ a.cycle.name }}</h1>
+  <p class="muted">{{ a.code }} · {{ a.role.title }} · version {{ a.version }}</p></div>
+  <div style="min-width:240px"><div class="small muted"><span id="answered">0</span> of {{ responses|length }} areas rated</div>
+  <div class="progress"><span id="progressbar" style="width:0%"></span></div></div>
+</div>
+{% if errors %}<div id="errors" class="flash error">Some areas need attention. They are highlighted below.</div>{% endif %}
+<div class="card small">
+  Choose the level that best describes what you <b>do today</b>, not what your role requires. Your role requirement is shown only after you submit, so it does not anchor your rating.
+  Evidence is required for levels 2–4 (one work example for L2, several examples or a complex output for L3, standard-setting or organisational impact for L4).
+  You can save a draft at any time.
+</div>
+<form method="post" action="/assessment/{{ a.id }}" id="selfform">
+{% for type in ['Knowledge', 'Skill', 'Competency'] %}
+  {% set items = responses|selectattr('area.type', 'equalto', type)|list %}
+  {% if items %}
+  <h2 class="type-{{ type }}">{{ type }} <span class="muted small">· {{ items|length }} areas</span></h2>
+  <p class="small muted">{{ guides.get(type, '') }}</p>
+  {% for r in items %}
+  {% set err = errors.get(r.id|string) %}
+  <div class="area{{ ' has-error' if err }}" id="area-{{ r.id }}" data-response>
+    <h3><span class="tag type-{{ type }}">{{ r.area.code }}</span> {{ r.area.name }}</h3>
+    <div class="meta">
+      <div><b>Definition</b>{{ r.area.definition }}</div>
+      <div><b>What it looks like</b>{{ r.area.observable }}</div>
+    </div>
+    <fieldset style="border:0;padding:0;margin:0">
+      <legend class="small" style="font-weight:600;margin-bottom:.3rem">Your current level</legend>
+      <div class="levels">
+      {% for s in scale %}
+        <input type="radio" id="l{{ r.id }}_{{ s.level }}" name="level_{{ r.id }}" value="{{ s.level }}" {{ 'checked' if r.self_level == s.level }}>
+        <label for="l{{ r.id }}_{{ s.level }}"><span class="lv">{{ s.level }} · {{ 'None' if s.level == 0 else s.label }}</span>{{ 'No knowledge or experience in this area yet.' if s.level == 0 else s.anchor(type) }}</label>
+      {% endfor %}
+      </div>
+    </fieldset>
+    <label for="ev{{ r.id }}">Evidence <span class="muted small" data-ev-hint>(required for levels 2–4)</span></label>
+    <textarea id="ev{{ r.id }}" name="evidence_{{ r.id }}" placeholder="e.g. {{ r.area.evidence_example }}">{{ r.self_evidence }}</textarea>
+    <div class="form-row">
+      <div><label for="lk{{ r.id }}">Evidence link (optional)</label>
+      <input type="url" id="lk{{ r.id }}" name="link_{{ r.id }}" value="{{ r.evidence_link }}" placeholder="https://… (approved location)"></div>
+      <div><label>Confidence in this rating</label>
+      {% for c in confidence %}<label class="inline"><input type="radio" name="conf_{{ r.id }}" value="{{ c }}" {{ 'checked' if r.confidence == c }}> {{ c }}</label>{% endfor %}</div>
+    </div>
+    {% if err %}<ul class="errors">{% for e in err %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+  </div>
+  {% endfor %}
+  {% endif %}
+{% endfor %}
+<div class="card sticky-actions">
+  <label class="inline"><input type="checkbox" name="confirm_accuracy" value="1"> I confirm this self-assessment is accurate to the best of my knowledge.</label>
+  {% if errors.get('confirm') %}<ul class="errors"><li>{{ errors['confirm'][0] }}</li></ul>{% endif %}
+  <div class="actions">
+    <button class="btn secondary" name="action" value="save" type="submit">Save draft</button>
+    <button class="btn" name="action" value="submit" type="submit">Submit to manager</button>
+    <span class="small muted">After submission you can no longer edit unless your manager returns it.</span>
+  </div>
+</div>
+</form>
+{% endblock %}

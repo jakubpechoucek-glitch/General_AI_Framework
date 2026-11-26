@@ -1,0 +1,18 @@
+{% extends "base.html" %}{% block title %}Admin{% endblock %}
+{% block content %}<h1>Administration</h1>{% include "admin/_nav.html" %}
+<div class="grid">
+  <div class="card"><div class="kpi-label">Active framework areas</div><div class="kpi">{{ areas }}</div><a href="/admin/areas">Manage</a></div>
+  <div class="card"><div class="kpi-label">Active cycle</div><div class="kpi" style="font-size:1.2rem">{{ cycles[0].name if cycles else 'None' }}</div><a href="/admin/cycles">Manage</a></div>
+  <div class="card"><div class="kpi-label">Assessments by status</div>
+  {% for s in ['Draft','Submitted','Manager Review','Calibration','Finalized'] %}<div class="small">{{ s }}: <b>{{ by_status.get(s, 0) }}</b></div>{% endfor %}</div>
+  <div class="card"><div class="kpi-label">Active employees without a role</div><div class="kpi" style="{{ 'color:var(--critical)' if no_role }}">{{ no_role }}</div><a href="/admin/users">Employees</a></div>
+</div>
+<h2>Teams</h2>
+<div class="table-wrap"><table><tr><th>Team</th><th class="num">Active roles</th><th class="num">Roles validated by management</th><th class="num">Employees</th><th></th></tr>
+{% for s in stats %}<tr><td>{{ s.team.name }}</td><td class="num">{{ s.roles }}</td><td class="num">{{ s.validated }} / {{ s.roles }}</td><td class="num">{{ s.employees }}</td><td><a href="/admin/teams/{{ s.team.id }}">Open</a></td></tr>
+{% else %}<tr><td colspan="5" class="muted">No teams yet. <a href="/admin/teams">Onboard a team</a> or <a href="/admin/import">import the workbook</a>.</td></tr>{% endfor %}</table></div>
+<h2>Role mismatches reported by employees</h2>
+<div class="table-wrap"><table><tr><th>When</th><th>Employee</th><th>Note</th></tr>
+{% for m in mismatches %}<tr><td class="small">{{ m.at|dt }}</td><td>{{ m.user_email }}</td><td>{{ m.detail }}</td></tr>{% else %}<tr><td colspan="3" class="muted">None</td></tr>{% endfor %}</table></div>
+<div class="card small muted" style="margin-top:1rem"><b>Onboarding a new team:</b> 1) Teams &amp; roles → create team. 2) Add roles or import a role matrix (download the template). 3) Validate the required levels with the team's management and record the sign-off. 4) Employees → import the employee list (with manager emails). 5) Make sure a cycle is active and share the link.</div>
+{% endblock %}

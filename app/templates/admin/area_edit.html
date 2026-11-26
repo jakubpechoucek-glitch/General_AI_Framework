@@ -1,0 +1,7 @@
+{% extends "base.html" %}{% block title %}Edit {{ area.code }}{% endblock %}
+{% block content %}<h1>Edit area {{ area.code }}</h1>{% include "admin/_nav.html" %}
+<div class="card"><form method="post" action="/admin/areas/{{ area.id }}">{% include "admin/_area_fields.html" %}
+<div class="actions"><button class="btn" name="action" value="save">Save</button><a class="btn secondary" href="/admin/areas">Cancel</a>
+<button class="btn danger" name="action" value="delete" data-confirm="Delete this area and its role requirements? Deactivating keeps history.">Delete</button></div>
+<p class="small muted">Deactivating hides the area from new and open assessments; finalised assessments keep their records. Delete is only possible when no assessment data exists.</p></form></div>
+{% endblock %}

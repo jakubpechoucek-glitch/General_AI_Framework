@@ -1,0 +1,9 @@
+{% macro chip(status) -%}<span class="chip {{ status_css[status] }}">{{ status }}</span>{%- endmacro %}
+{% macro wf(status) -%}<span class="chip wf">{{ status }}</span>{%- endmacro %}
+{% macro lv(v) -%}{{ '—' if v is none else v }}{%- endmacro %}
+{% macro bar(b) -%}
+{% set t = b.assessed or 0 %}
+{% if t %}<div class="bar" title="Meets {{ b.meets }} · Gap 1: {{ b.gap1 }} · Gap 2+: {{ b.gap2 }}">
+<span class="b-meets" style="width:{{ 100*b.meets/t }}%"></span><span class="b-gap1" style="width:{{ 100*b.gap1/t }}%"></span><span class="b-gap2" style="width:{{ 100*b.gap2/t }}%"></span></div>{% else %}<span class="muted">—</span>{% endif %}
+{%- endmacro %}
+{% macro legend() -%}<div class="legend small"><span><i style="background:#34a06b"></i>Meets / exceeds</span><span><i style="background:#f59e0b"></i>Gap 1 (development needed)</span><span><i style="background:#dc4c3f"></i>Gap 2+ (critical)</span></div>{%- endmacro %}

@@ -1,0 +1,39 @@
+{% extends "base.html" %}{% block title %}{{ team.name }}{% endblock %}
+{% block content %}<h1>{{ team.name }}</h1>{% include "admin/_nav.html" %}
+<div class="grid">
+<div class="card"><h3>Team</h3><form method="post" action="/admin/teams/{{ team.id }}">
+<label for="n">Name</label><input id="n" type="text" name="name" value="{{ team.name }}">
+<label for="d">Description</label><input id="d" type="text" name="description" value="{{ team.description }}">
+<div class="actions"><label class="inline"><input type="checkbox" name="active" {{ 'checked' if team.active }}> Active</label><button class="btn small">Save</button></div></form>
+<p class="small">{{ employees }} employee(s) · <a href="/admin/users?team_id={{ team.id }}">manage employees</a></p></div>
+<div class="card"><h3>Import / export role matrix</h3>
+<form method="post" action="/admin/teams/{{ team.id }}/import-roles" enctype="multipart/form-data">
+<input type="file" name="file" accept=".xlsx,.xlsm" required aria-label="Role matrix file">
+<div class="actions"><button class="btn small">Import roles (.xlsx)</button><a class="btn small secondary" href="/admin/teams/{{ team.id }}/matrix.xlsx">Export current matrix</a><a class="btn small secondary" href="/admin/templates/roles.xlsx">Template</a></div></form>
+<p class="small muted">Existing roles (same title) are updated, new ones are added. Header: Role Family · Role Title · one column per area code (e.g. “K01 | AI fundamentals”) · Validation Status · rationale · reviewer comments.</p></div>
+<div class="card"><h3>Management validation</h3>
+<p class="small">{{ roles|selectattr('is_validated')|list|length }} of {{ roles|length }} roles validated.</p>
+<form method="post" action="/admin/teams/{{ team.id }}/validate"><label for="vb">Validated by (name / forum)</label><input id="vb" type="text" name="validated_by" required placeholder="e.g. CRM leadership calibration workshop">
+<div class="actions"><button class="btn small" data-confirm="Mark all remaining roles as Validated?">Mark all roles validated</button></div></form></div>
+</div>
+
+<h2 id="matrix">Role requirement matrix</h2>
+<p class="small muted">Required level per role (0 Not required · 1 Basic · 2 Working · 3 Advanced · 4 Expert). Changes apply immediately to open assessments; finalised assessments keep the levels they were validated against.</p>
+<form method="post" action="/admin/teams/{{ team.id }}">
+<input type="hidden" name="action" value="matrix">
+<div class="table-wrap" style="max-height:75vh"><table class="matrix">
+<tr><th style="position:sticky;left:0;background:#fafbfc;z-index:2">Role</th><th>Status</th>{% for a in areas %}<th class="rot type-{{ a.type }}" title="{{ a.name }}">{{ a.code }} {{ a.name|truncate(30) }}</th>{% endfor %}<th class="rot">Required (1–4)</th><th class="rot">Key (3–4)</th></tr>
+{% for r in roles %}{% set req = r.required_map() %}
+<tr style="{{ 'opacity:.5' if not r.active }}"><td class="title"><a href="/admin/roles/{{ r.id }}">{{ r.title }}</a><br><span class="muted small">{{ r.family }}</span></td>
+<td><span class="chip {{ 'meets' if r.is_validated else 'neutral' }}" title="{{ r.validation_status }}">{{ 'Validated' if r.is_validated else 'Draft' if r.validation_status.startswith('Draft') else 'In review' }}</span></td>
+{% for a in areas %}{% set v = req.get(a.id, 0) %}<td><select name="req_{{ r.id }}_{{ a.id }}" class="l{{ v }}" aria-label="{{ r.title }} {{ a.code }}">{% for i in range(5) %}<option {{ 'selected' if v == i }}>{{ i }}</option>{% endfor %}</select></td>{% endfor %}
+<td>{{ req.values()|select('ge', 1)|list|length }}</td><td>{{ req.values()|select('ge', 3)|list|length }}</td></tr>
+{% else %}<tr><td colspan="{{ areas|length + 4 }}" class="muted">No roles yet.</td></tr>{% endfor %}
+</table></div>
+<div class="actions"><button class="btn">Save matrix</button></div></form>
+
+<div class="card" style="margin-top:1rem"><h3>Add a role</h3>
+<form method="post" action="/admin/teams/{{ team.id }}"><input type="hidden" name="action" value="add_role">
+<div class="form-row"><div><label for="rf">Role family</label><input id="rf" type="text" name="family"></div><div><label for="rt">Role title</label><input id="rt" type="text" name="title" required></div></div>
+<div class="actions"><button class="btn">Add role</button></div></form></div>
+{% endblock %}

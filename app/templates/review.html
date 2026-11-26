@@ -1,0 +1,52 @@
+{% extends "base.html" %}{% from "macros.html" import chip, wf, lv %}{% block title %}Review{% endblock %}
+{% block content %}
+{% set reviewing = may_review and a.status in ['Submitted', 'Manager Review'] %}
+{% set calibrating = may_calibrate and a.status == 'Calibration' %}
+<div class="section-head">
+  <div><h1>{{ a.employee.name }} · {{ a.cycle.name }}</h1>
+  <p class="muted">{{ a.code }} · {{ a.role.title }} ({{ a.role.family }}) · {{ wf(a.status) }} · version {{ a.version }} · submitted {{ a.assessment_date|dt }}</p></div>
+  <a class="btn secondary" href="/assessment/{{ a.id }}/results">Results view</a>
+</div>
+{% if not a.role.is_validated %}<div class="banner"><b>Role requirements not yet validated</b> ({{ a.role.validation_status }}). Confirm the required levels with team management before treating gaps as final.</div>{% endif %}
+{% if a.status == 'Draft' %}<div class="flash info">The employee is still working on the self-assessment.</div>{% endif %}
+{% if reviewing %}<div class="flash info"><b>Step: manager review.</b> Review the self-rating and evidence, then select your evidence-based level for each area. A comment is required where your level differs from the self level. Do not average.</div>{% endif %}
+{% if calibrating %}<div class="flash info"><b>Step: calibration.</b> Set the <i>validated current level</i>, a whole number agreed after review/calibration. It becomes the official level for the development gap. Then finalise.</div>{% endif %}
+
+<form method="post" action="/review/{{ a.id }}">
+<div class="table-wrap"><table>
+<tr><th style="min-width:220px">Area</th><th class="num">Req.</th><th class="num">Self</th><th>Confidence</th><th style="min-width:260px">Self evidence</th><th>Manager level</th><th style="min-width:220px">Manager comment</th><th>Validated</th><th>Status</th></tr>
+{% for r in responses if r.required_level > 0 %}
+{% set err = errors.get(r.id|string) %}
+<tr{% if err %} style="background:var(--critical-bg)"{% endif %}>
+<td><span class="tag type-{{ r.area.type }}">{{ r.area.code }}</span> {{ r.area.name }}{% if r.area.critical_control %} <span class="chip critical small" title="Critical control area">CC</span>{% endif %}
+{% if err %}<ul class="errors">{% for e in err %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}</td>
+<td class="num"><b>{{ r.required_level }}</b></td><td class="num">{{ lv(r.self_level) }}</td><td class="small">{{ r.confidence or '—' }}</td>
+<td class="small">{{ r.self_evidence or '—' }}{% if r.evidence_link %}<br><a href="{{ r.evidence_link }}" target="_blank" rel="noopener noreferrer">evidence link</a>{% endif %}</td>
+<td>{% if reviewing %}<select name="mlevel_{{ r.id }}" aria-label="Manager level {{ r.area.code }}"><option value="">–</option>{% for i in range(5) %}<option value="{{ i }}" {{ 'selected' if r.manager_level == i }}>{{ i }}</option>{% endfor %}</select>{% else %}{{ lv(r.manager_level) }}{% endif %}</td>
+<td>{% if reviewing %}<textarea name="mcomment_{{ r.id }}" rows="2" aria-label="Manager comment {{ r.area.code }}">{{ r.manager_comment }}</textarea>{% else %}<span class="small">{{ r.manager_comment or '—' }}</span>{% endif %}</td>
+<td>{% if calibrating %}<select name="vlevel_{{ r.id }}" aria-label="Validated level {{ r.area.code }}"><option value="">–</option>{% for i in range(5) %}<option value="{{ i }}" {{ 'selected' if r.validated_level == i }}>{{ i }}</option>{% endfor %}</select>{% else %}{{ lv(r.validated_level) }}{% endif %}</td>
+<td>{{ chip(status_of(r.required_level, r.validated_level)) }}</td></tr>
+{% endfor %}
+</table></div>
+{% if reviewing %}
+<div class="actions"><button class="btn secondary" name="action" value="save_review">Save review</button>
+<button class="btn" name="action" value="complete_review">Complete review → calibration</button></div>
+{% endif %}
+{% if calibrating %}
+<div class="actions">
+  <button class="btn secondary" name="action" value="save_validated">Save validated levels</button>
+  <button class="btn secondary" name="action" value="copy_manager" title="Fills only empty validated levels with the manager level; review before finalising">Pre-fill empty with manager levels</button>
+  <label for="nrd" class="inline">Next review <input id="nrd" type="date" name="next_review_date" value="{{ default_next.isoformat() }}" style="width:auto"></label>
+  <button class="btn" name="action" value="finalize">Finalise assessment</button>
+</div>
+{% endif %}
+</form>
+{% if may_calibrate and a.status != 'Draft' %}
+<details class="card" style="margin-top:1.5rem"><summary>Return to employee / reopen</summary>
+<form method="post" action="/review/{{ a.id }}">
+<p class="small muted">Sets the assessment back to Draft so the employee can edit it. The version number increases and the action is recorded in the audit log.{% if a.status == 'Finalized' %} The official result is withdrawn until finalised again.{% endif %}</p>
+<label for="reason">Reason</label><input id="reason" type="text" name="reason" required>
+<div class="actions"><button class="btn danger" name="action" value="reopen">Reopen as Draft</button></div>
+</form></details>
+{% endif %}
+{% endblock %}

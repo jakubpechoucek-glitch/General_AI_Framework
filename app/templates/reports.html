@@ -1,0 +1,50 @@
+{% extends "base.html" %}{% from "macros.html" import wf, bar, legend %}{% block title %}Gap reports{% endblock %}
+{% block content %}
+<div class="section-head"><h1>Gap reports</h1>
+<form method="get" class="actions" style="margin:0">
+{% if teams %}<select name="team_id" aria-label="Team"><option value="">All teams</option>{% for t in teams %}<option value="{{ t.id }}" {{ 'selected' if team_id == t.id }}>{{ t.name }}</option>{% endfor %}</select>{% endif %}
+<select name="cycle_id" aria-label="Cycle">{% for c in cycles %}<option value="{{ c.id }}" {{ 'selected' if cycle and c.id == cycle.id }}>{{ c.name }}</option>{% endfor %}</select>
+<button class="btn secondary">Apply</button>
+<a class="btn" href="/reports/export.xlsx?cycle_id={{ cycle.id if cycle }}{{ '&team_id=%s'|format(team_id) if team_id }}">Export to Excel</a></form></div>
+<p class="small muted">Official figures use finalised assessments only (validated current level). Knowledge, Skill and Competency are reported separately. There is deliberately no single overall “AI score”.</p>
+
+<div class="grid">
+  <div class="card"><div class="kpi-label">Employees in scope</div><div class="kpi">{{ t.employees_total }}</div></div>
+  <div class="card"><div class="kpi-label">Finalised assessments</div><div class="kpi">{{ t.employees_finalized }}</div></div>
+  {% for k, b in t.types.items() %}<div class="card"><span class="tag type-{{ k }}">{{ k }}</span><div class="kpi">{{ b.meets_pct|pct }}</div><div class="kpi-label">ratings meet requirement · avg gap {{ b.avg_gap|num(2) }}</div></div>{% endfor %}
+</div>
+
+{% if t.top_gaps %}
+<div class="card"><h3>Most common gaps (learning priorities)</h3>
+<ol>{% for b in t.top_gaps %}<li><b>{{ b.code }}</b> {{ b.area.name if b.area }} · {{ b.gap1 + b.gap2 }} of {{ b.assessed }} employees below requirement ({{ b.gap2 }} critical)</li>{% endfor %}</ol></div>
+{% endif %}
+
+<h2>Team gap by area</h2>{{ legend() }}
+<div class="table-wrap"><table>
+<tr><th>Area</th><th class="num">Assessed</th><th class="num">Meets</th><th class="num">Gap 1</th><th class="num">Gap 2+</th><th class="num">Meets %</th><th>Distribution</th></tr>
+{% for b in t.areas %}<tr><td><span class="tag type-{{ b.area.type if b.area }}">{{ b.code }}</span> {{ b.area.name if b.area }}{% if b.area and b.area.critical_control %} <span class="chip critical">CC</span>{% endif %}</td>
+<td class="num">{{ b.employees }}</td><td class="num">{{ b.meets }}</td><td class="num">{{ b.gap1 }}</td><td class="num">{{ b.gap2 }}</td><td class="num">{{ b.meets_pct|pct }}</td><td>{{ bar(b) }}</td></tr>
+{% else %}<tr><td colspan="7" class="muted">No finalised assessments yet.</td></tr>{% endfor %}
+</table></div>
+
+<div class="grid" style="margin-top:1rem">
+{% for title, key in [('By role family', 'families'), ('By role', 'roles')] %}
+<div><h2>{{ title }}</h2><div class="table-wrap"><table>
+<tr><th>{{ title[3:]|capitalize }}</th><th class="num">Employees</th><th class="num">Meets %</th><th class="num">Avg gap</th><th>Distribution</th></tr>
+{% for k, b in t[key].items() %}<tr><td>{{ k }}</td><td class="num">{{ b.employees }}</td><td class="num">{{ b.meets_pct|pct }}</td><td class="num">{{ b.avg_gap|num(2) }}</td><td>{{ bar(b) }}</td></tr>
+{% else %}<tr><td colspan="5" class="muted">—</td></tr>{% endfor %}
+</table></div></div>
+{% endfor %}
+</div>
+
+<h2>Employee gap summary</h2>
+<div class="table-wrap"><table>
+<tr><th>Employee</th><th>Role</th><th>Status</th><th class="num">Required</th><th class="num">Assessed</th><th class="num">Meets</th><th class="num">Gap 1</th><th class="num">Gap 2+</th><th class="num">Avg gap</th><th>Priority development areas</th></tr>
+{% for e in emp %}{% set s = e.summary %}{% set a = e.assessment %}
+<tr><td>{{ e.user.name }}</td><td class="small">{{ e.user.role.title if e.user.role else '—' }}</td><td>{{ wf(a.status) if a else '<span class="muted small">Not started</span>'|safe }}</td>
+{% if s %}<td class="num">{{ s.required_areas }}</td><td class="num">{{ s.assessed }}</td><td class="num">{{ s.meets }}</td><td class="num">{{ s.gap1 }}</td><td class="num">{{ s.gap2 }}</td><td class="num">{{ s.avg_gap|num(2) }}</td>
+<td class="small">{% for r in s.priorities %}<b>{{ r.code }}</b> {{ r.name }} (gap {{ r.gap }}){{ '; ' if not loop.last }}{% endfor %}{% if s.critical_control_gaps %}<br><span class="chip critical">Critical-control gap</span>{% endif %}</td>
+{% else %}<td colspan="7" class="muted small">No official result yet</td>{% endif %}</tr>
+{% endfor %}
+</table></div>
+{% endblock %}

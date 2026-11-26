@@ -1,0 +1,11 @@
+{% extends "base.html" %}{% block title %}Cycles{% endblock %}
+{% block content %}<h1>Assessment cycles</h1>{% include "admin/_nav.html" %}
+<div class="table-wrap"><table><tr><th>Cycle</th><th>Period</th><th>Assessments</th><th>Active</th><th></th></tr>
+{% for c, counts in cycles %}<tr><td><b>{{ c.name }}</b></td><td class="small">{{ c.start_date or '' }} – {{ c.end_date or '' }}</td><td class="small">{% for k, v in counts.items() %}{{ k }}: {{ v }}{{ ' · ' if not loop.last }}{% else %}—{% endfor %}</td>
+<td>{{ 'Active' if c.active else '' }}</td><td><form method="post" action="/admin/cycles/{{ c.id }}"><button class="btn small secondary">{{ 'Close' if c.active else 'Make active' }}</button></form></td></tr>
+{% else %}<tr><td colspan="5" class="muted">No cycles.</td></tr>{% endfor %}</table></div>
+<div class="card" style="margin-top:1rem"><h3>New cycle</h3><p class="small muted">Only one cycle is active at a time; creating one makes it active. Recommended: annual review, or earlier after a material role change.</p>
+<form method="post" action="/admin/cycles"><div class="form-row"><div><label for="cn">Name</label><input id="cn" type="text" name="name" required placeholder="2027 Annual"></div>
+<div><label for="cs">Start</label><input id="cs" type="date" name="start_date"></div><div><label for="ce">End</label><input id="ce" type="date" name="end_date"></div></div>
+<div class="actions"><button class="btn">Create cycle</button></div></form></div>
+{% endblock %}

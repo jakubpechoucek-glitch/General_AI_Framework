@@ -1,0 +1,11 @@
+<div class="form-row">
+<div><label for="code">Code</label><input id="code" type="text" name="code" value="{{ area.code if area }}" required placeholder="e.g. S12"></div>
+<div><label for="type">Type</label><select id="type" name="type">{% for t in types %}<option {{ 'selected' if area and area.type == t }}>{{ t }}</option>{% endfor %}</select></div>
+<div><label for="sort_order">Sort order</label><input id="sort_order" type="number" name="sort_order" value="{{ area.sort_order if area else '' }}"></div>
+</div>
+<label for="name">Area name</label><input id="name" type="text" name="name" value="{{ area.name if area }}" required>
+<label for="definition">Definition</label><textarea id="definition" name="definition">{{ area.definition if area }}</textarea>
+<label for="observable">Observable statement</label><textarea id="observable" name="observable">{{ area.observable if area }}</textarea>
+<label for="evidence_example">Typical evidence / example</label><textarea id="evidence_example" name="evidence_example">{{ area.evidence_example if area }}</textarea>
+<div class="actions"><label class="inline"><input type="checkbox" name="critical_control" {{ 'checked' if area and area.critical_control }}> Critical control area (flag any gap in reports)</label>
+<label class="inline"><input type="checkbox" name="active" {{ 'checked' if not area or area.active }}> Active</label></div>

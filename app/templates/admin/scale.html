@@ -1,0 +1,12 @@
+{% extends "base.html" %}{% block title %}Proficiency scale{% endblock %}
+{% block content %}<h1>Proficiency scale (0–4)</h1>{% include "admin/_nav.html" %}
+<form method="post" action="/admin/scale">
+{% for s in levels %}<div class="card"><h3>Level {{ s.level }}</h3>
+<div class="form-row"><div><label for="label_{{ s.level }}">Label</label><input id="label_{{ s.level }}" type="text" name="label_{{ s.level }}" value="{{ s.label }}"></div></div>
+<div class="form-row">
+<div><label>Knowledge anchor</label><textarea name="knowledge_{{ s.level }}">{{ s.knowledge }}</textarea></div>
+<div><label>Skill anchor</label><textarea name="skill_{{ s.level }}">{{ s.skill }}</textarea></div>
+<div><label>Competency anchor</label><textarea name="competency_{{ s.level }}">{{ s.competency }}</textarea></div></div>
+<label>Sample JD wording</label><textarea name="jd_{{ s.level }}">{{ s.jd_wording }}</textarea></div>{% endfor %}
+<div class="actions"><button class="btn">Save scale</button></div></form>
+{% endblock %}

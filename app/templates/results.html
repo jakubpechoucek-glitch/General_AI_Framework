@@ -1,0 +1,61 @@
+{% extends "base.html" %}{% from "macros.html" import chip, wf, lv %}{% block title %}Results{% endblock %}
+{% block content %}
+<div class="section-head">
+  <div><h1>{{ a.employee.name }} · {{ a.cycle.name }}</h1>
+  <p class="muted">{{ a.code }} · {{ a.role.title }} · {{ wf(a.status) }} · version {{ a.version }}</p></div>
+  {% if me.id != a.employee_id %}<a class="btn secondary" href="/review/{{ a.id }}">Open review</a>{% endif %}
+</div>
+{% if not a.role.is_validated %}
+<div class="banner"><b>Role requirements not yet validated.</b> The required levels for “{{ a.role.title }}” are still a proposal ({{ a.role.validation_status }}) and must be confirmed with team management. Gaps may change.</div>
+{% endif %}
+{% if official %}
+<div class="flash success">Official result: validated on {{ a.validation_date|dt }}{% if a.validated_by %} by {{ a.validated_by.name }}{% endif %}. Next review: {{ a.next_review_date|dt }}.</div>
+{% else %}
+<div class="flash info"><b>Indicative result.</b> This compares your <i>self-assessment</i> with the role requirement (Self Gap). The official development gap is available once your manager has validated your levels.</div>
+{% endif %}
+
+<div class="grid">
+  <div class="card"><div class="kpi-label">Required areas</div><div class="kpi">{{ summary.required_areas }}</div></div>
+  <div class="card"><div class="kpi-label">Meets or exceeds</div><div class="kpi" style="color:var(--meets)">{{ summary.meets }}</div></div>
+  <div class="card"><div class="kpi-label">Development needed (gap 1)</div><div class="kpi" style="color:var(--development)">{{ summary.gap1 }}</div></div>
+  <div class="card"><div class="kpi-label">Critical gaps (2+)</div><div class="kpi" style="color:var(--critical)">{{ summary.gap2 }}</div></div>
+</div>
+{% if summary.critical_control_gaps %}
+<div class="banner" style="background:var(--critical-bg);border-color:#f3b4ae"><b>Gap in a critical control area:</b>
+{% for r in summary.critical_control_gaps %}{{ r.code }} {{ r.name }}{{ ', ' if not loop.last }}{% endfor %}. These matter regardless of your overall profile.</div>
+{% endif %}
+
+<div class="grid">
+{% for t, b in summary.by_type.items() if b.required %}
+  <div class="card"><span class="tag type-{{ t }}">{{ t }}</span>
+  <p class="small">{{ b.meets }} of {{ b.required }} met · gap 1: {{ b.gap1 }} · gap 2+: {{ b.gap2 }}</p></div>
+{% endfor %}
+</div>
+
+{% if summary.priorities %}
+<h2>Development priorities</h2>
+<p class="small muted">Sorted by priority score = gap × required level. A two-level gap in a level-4 area ranks above the same gap in a level-1 area. This is not a performance score.</p>
+<div class="table-wrap"><table>
+<tr><th>Area</th><th class="num">Required</th><th class="num">{{ 'Validated' if official else 'Self' }}</th><th class="num">Gap</th><th class="num">Priority</th><th>Status</th></tr>
+{% for r in summary.priorities %}<tr><td><b>{{ r.code }}</b> {{ r.name }}</td><td class="num">{{ r.required }}</td><td class="num">{{ r.validated }}</td><td class="num">{{ r.gap }}</td><td class="num">{{ r.priority }}</td><td>{{ chip(r.status) }}</td></tr>{% endfor %}
+</table></div>
+{% endif %}
+
+<h2>All areas</h2>
+<div class="table-wrap"><table>
+<tr><th>Area</th><th class="num">Required</th><th class="num">Self</th>{% if a.status in ['Calibration','Finalized'] or me.id != a.employee_id %}<th class="num">Manager</th>{% endif %}<th class="num">Validated</th><th class="num">Self gap</th><th class="num">Dev. gap</th><th class="num">Surplus</th><th>Status</th><th>Evidence</th></tr>
+{% for r in responses %}
+{% set st = status_of(r.required_level, r.validated_level if official else r.self_level) %}
+<tr><td><span class="tag type-{{ r.area.type }}">{{ r.area.code }}</span> {{ r.area.name }}</td>
+<td class="num">{{ r.required_level }}</td><td class="num">{{ lv(r.self_level) }}</td>
+{% if a.status in ['Calibration','Finalized'] or me.id != a.employee_id %}<td class="num">{{ lv(r.manager_level) }}</td>{% endif %}
+<td class="num">{{ lv(r.validated_level) }}</td>
+<td class="num">{{ lv(self_gap(r.required_level, r.self_level)) if r.required_level else '—' }}</td>
+<td class="num">{{ lv(dev_gap(r.required_level, r.validated_level)) if r.required_level else '—' }}</td>
+<td class="num">{{ lv(surplus(r.required_level, r.validated_level)) if r.required_level else '—' }}</td>
+<td>{{ chip(st) }}</td>
+<td class="small">{{ r.self_evidence|truncate(140) }}{% if r.evidence_link %} <a href="{{ r.evidence_link }}" rel="noopener noreferrer" target="_blank">link</a>{% endif %}{% if r.manager_comment and (a.status in ['Calibration','Finalized'] or me.id != a.employee_id) %}<br><i>Manager: {{ r.manager_comment|truncate(140) }}</i>{% endif %}</td></tr>
+{% endfor %}
+</table></div>
+<p class="small muted">Status shown {{ 'uses the validated current level' if official else 'is indicative and uses your self level' }}. Development Gap = MAX(Required − Validated, 0); Surplus = MAX(Validated − Required, 0). Surplus never offsets a gap in another area.</p>
+{% endblock %}

@@ -1,0 +1,5 @@
+{% set p = request.url.path %}
+<nav class="actions" style="margin:0 0 1rem" aria-label="Admin">
+{% for href, label in [('/admin','Overview'),('/admin/areas','Framework areas'),('/admin/scale','Proficiency scale'),('/admin/teams','Teams & roles'),('/admin/users','Employees'),('/admin/cycles','Cycles'),('/admin/assessments','Assessments'),('/admin/import','Import workbook'),('/admin/audit','Audit log')] %}
+<a class="btn small {{ '' if p == href or (href != '/admin' and p.startswith(href)) else 'secondary' }}" href="{{ href }}">{{ label }}</a>{% endfor %}
+</nav>

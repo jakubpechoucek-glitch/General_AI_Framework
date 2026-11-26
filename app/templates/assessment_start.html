@@ -1,0 +1,29 @@
+{% extends "base.html" %}{% block title %}Start{% endblock %}
+{% block content %}
+<h1>AI self-assessment{% if cycle %} · {{ cycle.name }}{% endif %}</h1>
+{% if not cycle %}
+<div class="card">No assessment cycle is open at the moment.</div>
+{% elif not me.role %}
+<div class="card">No role is assigned to you yet. Please contact the administrator.</div>
+{% else %}
+<div class="card">
+  <h2 style="margin-top:0">Step 1 · Confirm your role</h2>
+  <p>The areas you are asked about depend on your role. Please check that this is correct:</p>
+  <p style="font-size:1.1rem"><b>{{ me.role.title }}</b><br><span class="muted">{{ me.role.family }} · {{ me.team.name if me.team }}</span></p>
+  <form method="post" action="/assessment/start">
+    <label class="inline"><input type="radio" name="confirm" value="yes" checked> Yes, this is my role</label>
+    <label class="inline"><input type="radio" name="confirm" value="no" data-toggle="#mismatch"> No, my role is different</label>
+    <div id="mismatch" hidden>
+      <label for="note">What is your correct role title (and anything else we should know)?</label>
+      <textarea id="note" name="note"></textarea>
+    </div>
+    <div class="actions"><button class="btn" type="submit">Continue</button></div>
+  </form>
+</div>
+<div class="card small muted">
+  <b>Before you start.</b> Rate your <i>current</i> level honestly, based on what you do today. For levels 2–4 you will be asked for a concrete example.
+  Do not paste confidential, customer or personal data into evidence fields. Link to an approved location instead.
+  Level 4 means recognised expertise, setting standards or organisational direction, not just being a very good user.
+</div>
+{% endif %}
+{% endblock %}

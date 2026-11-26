@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}AI KSC Assessment{% endblock %} · General AI Framework</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<header class="top"><div class="inner">
+  <a class="brand" href="/">General AI Framework</a>
+  {% if me %}
+  {% set p = request.url.path %}
+  <nav aria-label="Main">
+    <a href="/" class="{{ 'on' if p == '/' }}">Home</a>
+    <a href="/assessment" class="{{ 'on' if p.startswith('/assessment') }}">My assessment</a>
+    {% if me_is_manager or me.is_calibrator or me.is_admin %}
+    <a href="/team" class="{{ 'on' if p.startswith('/team') or p.startswith('/review') }}">Team reviews</a>
+    <a href="/reports" class="{{ 'on' if p.startswith('/reports') }}">Gap reports</a>
+    {% endif %}
+    <a href="/framework" class="{{ 'on' if p.startswith('/framework') }}">Framework</a>
+    {% if me.is_admin %}<a href="/admin" class="{{ 'on' if p.startswith('/admin') }}">Admin</a>{% endif %}
+  </nav>
+  <div class="who">{{ me.name }} · <a href="/password">Password</a> · <a href="/logout">Sign out</a></div>
+  {% endif %}
+</div></header>
+<main>
+  {% for kind, msg in flashes %}<div class="flash {{ kind }}" role="status">{{ msg }}</div>{% endfor %}
+  {% block content %}{% endblock %}
+</main>
+<script src="/static/app.js"></script>
+</body>
+</html>

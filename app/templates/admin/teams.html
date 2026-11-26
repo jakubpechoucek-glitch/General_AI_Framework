@@ -1,0 +1,10 @@
+{% extends "base.html" %}{% block title %}Teams{% endblock %}
+{% block content %}<h1>Teams &amp; roles</h1>{% include "admin/_nav.html" %}
+<div class="table-wrap"><table><tr><th>Team</th><th>Description</th><th class="num">Roles</th><th class="num">Validated</th><th>Active</th><th></th></tr>
+{% for t in teams %}<tr><td><b>{{ t.name }}</b></td><td class="small">{{ t.description }}</td><td class="num">{{ t.roles|length }}</td><td class="num">{{ t.roles|selectattr('is_validated')|list|length }}</td><td>{{ 'Yes' if t.active else 'No' }}</td><td><a href="/admin/teams/{{ t.id }}">Open</a></td></tr>
+{% else %}<tr><td colspan="6" class="muted">No teams yet.</td></tr>{% endfor %}</table></div>
+<div class="card" style="margin-top:1rem"><h3>Onboard a new team</h3>
+<form method="post" action="/admin/teams"><div class="form-row"><div><label for="tn">Team name</label><input id="tn" type="text" name="name" required placeholder="e.g. Retail Banking"></div>
+<div><label for="td">Description</label><input id="td" type="text" name="description"></div></div>
+<div class="actions"><button class="btn">Create team</button><a class="btn secondary" href="/admin/templates/roles.xlsx">Download role-matrix template</a></div></form></div>
+{% endblock %}

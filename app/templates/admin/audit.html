@@ -1,0 +1,5 @@
+{% extends "base.html" %}{% block title %}Audit log{% endblock %}
+{% block content %}<h1>Audit log</h1>{% include "admin/_nav.html" %}
+<div class="table-wrap"><table><tr><th>When (UTC)</th><th>User</th><th>Action</th><th>Entity</th><th>Detail</th></tr>
+{% for e in items %}<tr><td class="small">{{ e.at.strftime('%Y-%m-%d %H:%M') }}</td><td class="small">{{ e.user_email }}</td><td>{{ e.action }}</td><td class="small">{{ e.entity }}</td><td class="small">{{ e.detail|truncate(200) }}</td></tr>{% endfor %}</table></div>
+{% endblock %}

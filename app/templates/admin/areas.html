@@ -1,0 +1,12 @@
+{% extends "base.html" %}{% block title %}Framework areas{% endblock %}
+{% block content %}<h1>Framework areas</h1>{% include "admin/_nav.html" %}
+<div class="table-wrap"><table><tr><th>#</th><th>Code</th><th>Type</th><th>Area</th><th>Definition</th><th>Critical control</th><th>Active</th><th></th></tr>
+{% for a in areas %}<tr style="{{ 'opacity:.55' if not a.active }}"><td class="small">{{ a.sort_order }}</td><td><b>{{ a.code }}</b></td><td class="type-{{ a.type }}">{{ a.type }}</td><td>{{ a.name }}</td><td class="small">{{ a.definition|truncate(110) }}</td><td>{{ 'Yes' if a.critical_control else '' }}</td><td>{{ 'Yes' if a.active else 'No' }}</td><td><a href="/admin/areas/{{ a.id }}">Edit</a></td></tr>{% endfor %}
+</table></div>
+<details class="card" style="margin-top:1rem"><summary><b>Add an area</b></summary>
+<form method="post" action="/admin/areas">{% with area=None %}{% include "admin/_area_fields.html" %}{% endwith %}
+<div class="actions"><button class="btn">Add area</button></div></form></details>
+<div class="card"><h3>Evidence guidance by type</h3><p class="small muted">Shown to employees above each section (rule R05: Knowledge → explanation/check; Skill → work output; Competency → applied outcome).</p>
+<form method="post" action="/admin/evidence">{% for t in types %}<label for="g{{ t }}">{{ t }}</label><textarea id="g{{ t }}" name="guide_{{ t }}">{{ guides.get(t, '') }}</textarea>{% endfor %}
+<div class="actions"><button class="btn">Save guidance</button></div></form></div>
+{% endblock %}

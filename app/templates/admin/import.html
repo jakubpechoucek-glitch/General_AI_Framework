@@ -1,0 +1,14 @@
+{% extends "base.html" %}{% block title %}Import{% endblock %}
+{% block content %}<h1>Import workbook</h1>{% include "admin/_nav.html" %}
+<div class="card"><p>Upload a workbook in the layout of <i>CRM AI Skills Pool and Role Rating.xlsx</i>. The import reads the sheets
+<b>General AI Framework</b> (areas), <b>Proficiency Scale</b> (0–4 anchors) and the role matrix (<b>… KSC Role Rating</b> or any sheet with a “Role Title” header and area-code columns).
+Existing records are updated by code / role title; nothing is deleted.</p>
+<form method="post" action="/admin/import" enctype="multipart/form-data">
+<label for="wf">Workbook (.xlsx)</label><input id="wf" type="file" name="file" accept=".xlsx,.xlsm" required>
+<div class="actions"><label class="inline"><input type="checkbox" name="parts" value="framework" checked> Framework areas</label>
+<label class="inline"><input type="checkbox" name="parts" value="scale" checked> Proficiency scale</label>
+<label class="inline"><input type="checkbox" name="parts" value="roles" checked> Role matrix</label></div>
+<div class="form-row"><div><label for="tid">Into team</label><select id="tid" name="team_id"><option value="">— new team —</option>{% for t in teams %}<option value="{{ t.id }}">{{ t.name }}</option>{% endfor %}</select></div>
+<div><label for="nt">New team name</label><input id="nt" type="text" name="new_team" placeholder="e.g. CRM"></div></div>
+<div class="actions"><button class="btn">Import</button></div></form></div>
+{% endblock %}

@@ -1,0 +1,46 @@
+{% extends "base.html" %}{% from "macros.html" import wf %}
+{% block content %}
+<h1>Hello, {{ me.name.split(' ')[0] }}</h1>
+<p class="muted">{{ me.role.title if me.role else 'No role assigned' }}{% if me.team %} · {{ me.team.name }}{% endif %}{% if me.manager %} · Manager: {{ me.manager.name }}{% endif %}</p>
+
+<div class="grid">
+  <div class="card">
+    <h3>My AI self-assessment</h3>
+    {% if not cycle %}
+      <p class="muted">There is no active assessment cycle right now.</p>
+    {% elif not current %}
+      <p>Cycle <b>{{ cycle.name }}</b> is open. It takes about 20–30 minutes.</p>
+      <a class="btn" href="/assessment">Start self-assessment</a>
+    {% else %}
+      <p>Cycle <b>{{ cycle.name }}</b> · {{ wf(current.status) }}</p>
+      {% if current.status == 'Draft' %}<a class="btn" href="/assessment/{{ current.id }}">Continue</a>
+      {% else %}<a class="btn" href="/assessment/{{ current.id }}/results">View results</a>{% endif %}
+    {% endif %}
+  </div>
+  {% if reports %}
+  <div class="card">
+    <h3>Team reviews</h3>
+    <p><span class="kpi">{{ pending|length }}</span> <span class="kpi-label">assessment(s) waiting for review or calibration</span></p>
+    <a class="btn secondary" href="/team">Open team reviews</a>
+  </div>
+  {% endif %}
+  <div class="card">
+    <h3>How it works</h3>
+    <ol class="small" style="padding-left:1.1rem;margin:0">
+      <li>Confirm your role.</li>
+      <li>Rate your current level (0–4) for each area your role requires, with evidence.</li>
+      <li>Your manager reviews the ratings and evidence.</li>
+      <li>After calibration, the validated level gives your official development gap.</li>
+    </ol>
+  </div>
+</div>
+
+{% if history|length > 1 %}
+<h2>Previous assessments</h2>
+<div class="table-wrap"><table>
+<tr><th>Cycle</th><th>ID</th><th>Status</th><th>Validated</th><th></th></tr>
+{% for a in history %}<tr><td>{{ a.cycle.name }}</td><td>{{ a.code }}</td><td>{{ wf(a.status) }}</td><td>{{ a.validation_date|dt }}</td>
+<td><a href="/assessment/{{ a.id }}{{ '' if a.status == 'Draft' else '/results' }}">Open</a></td></tr>{% endfor %}
+</table></div>
+{% endif %}
+{% endblock %}
