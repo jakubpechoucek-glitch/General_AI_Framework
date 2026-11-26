@@ -47,6 +47,7 @@ Managers cannot review or validate their own assessment.
 | `DATABASE_URL` | `sqlite:///data/app.db` | e.g. `postgresql+psycopg://user:pass@host/db` (install the `psycopg` driver) |
 | `SECRET_KEY` | random per start | **Set a fixed value in production**, otherwise sessions end at every restart |
 | `HTTPS_ONLY` | `0` | Set to `1` behind HTTPS so session cookies are marked Secure |
+| `ADMIN_EMAIL`, `ADMIN_PASSWORD` | – | If set and no administrator exists yet, the first admin is created at start-up (password must be changed at first sign-in). Used for hosted deployments where the seed script is not run. |
 
 ## Running in production
 
@@ -60,6 +61,24 @@ uvicorn app.main:app --host 0.0.0.0 --port 8000 --workers 2
 Put it behind your organisation's reverse proxy / HTTPS. Any platform that runs a Python web service works
 (Azure App Service, a container, Render, an internal VM). The health check endpoint is `/healthz`.
 Tables are created automatically at start-up. For later schema changes, adding Alembic migrations is recommended.
+
+## Deploying on Render
+
+`render.yaml` describes a Python web service plus a PostgreSQL database (region Frankfurt).
+
+1. Create the PostgreSQL database and the web service (Blueprint, dashboard or the Render MCP tools):
+   - Build: `pip install -r requirements.txt`
+   - Start: `uvicorn app.main:app --host 0.0.0.0 --port $PORT --proxy-headers --forwarded-allow-ips '*'`
+   - Health check: `/healthz`
+   - Env vars: `DATABASE_URL` (internal connection string of the database), `SECRET_KEY`, `HTTPS_ONLY=1`,
+     `ADMIN_EMAIL`, `ADMIN_PASSWORD`, `PYTHON_VERSION`.
+2. Open the service URL, sign in as the admin and set your own password.
+3. **Admin → Import workbook**: upload the framework workbook (framework areas, scale, role matrix into a new team, e.g. *CRM*).
+   This keeps organisational data out of the public repository.
+4. **Admin → Cycles**: create the active cycle; **Admin → Employees**: import employees.
+
+Notes: do not use SQLite on Render, because the service's disk is wiped on every deploy. On the free plan the service sleeps when idle
+(first request takes ~1 minute) and the free database expires after 30 days. Use paid plans for real use.
 
 ## Security
 
