@@ -1,4 +1,4 @@
-{% extends "base.html" %}{% from "macros.html" import chip, wf, lv %}{% block title %}Results{% endblock %}
+{% extends "base.html" %}{% from "macros.html" import chip, wf, lv, help %}{% block title %}Results{% endblock %}
 {% block content %}
 <div class="section-head">
   <div><h1>{{ a.employee.name }} · {{ a.cycle.name }}</h1>
@@ -33,7 +33,7 @@
 </div>
 
 {% if summary.priorities %}
-<h2>Development priorities</h2>
+<div class="section-head"><h2>Development priorities</h2>{{ help("employee#step-6-read-your-results", "How to read your results") }}</div>
 <p class="small muted">Sorted by priority score = gap × required level. A two-level gap in a level-4 area ranks above the same gap in a level-1 area. This is not a performance score.</p>
 <div class="table-wrap"><table>
 <tr><th>Area</th><th class="num">Required</th><th class="num">{{ 'Validated' if official else 'Self' }}</th><th class="num">Gap</th><th class="num">Priority</th><th>Status</th></tr>

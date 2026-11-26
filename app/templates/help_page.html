@@ -1,0 +1,11 @@
+{% extends "base.html" %}{% block title %}{{ title }} · Help{% endblock %}
+{% block content %}
+<div class="help-layout">
+  <aside class="help-side" aria-label="Guide navigation">
+    <a href="/help" class="small">← All guides</a>
+    <ul class="help-pages">{% for s, t, who, d in pages %}<li><a href="/help/{{ s }}" class="{{ 'on' if s == slug }}">{{ t }}</a></li>{% endfor %}</ul>
+    <div class="help-toc"><div class="tag muted">On this page</div>{{ toc|safe }}</div>
+  </aside>
+  <article class="card help-body">{{ body|safe }}</article>
+</div>
+{% endblock %}

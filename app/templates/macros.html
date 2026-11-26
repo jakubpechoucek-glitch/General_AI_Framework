@@ -7,3 +7,4 @@
 <span class="b-meets" style="width:{{ 100*b.meets/t }}%"></span><span class="b-gap1" style="width:{{ 100*b.gap1/t }}%"></span><span class="b-gap2" style="width:{{ 100*b.gap2/t }}%"></span></div>{% else %}<span class="muted">—</span>{% endif %}
 {%- endmacro %}
 {% macro legend() -%}<div class="legend small"><span><i style="background:#34a06b"></i>Meets / exceeds</span><span><i style="background:#f59e0b"></i>Gap 1 (development needed)</span><span><i style="background:#dc4c3f"></i>Gap 2+ (critical)</span></div>{%- endmacro %}
+{% macro help(path, label="Help") -%}<a class="help-link" href="/help/{{ path }}" target="_blank" rel="noopener">{{ label }}</a>{%- endmacro %}

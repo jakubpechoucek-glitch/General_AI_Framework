@@ -38,12 +38,13 @@ SECRET_KEY=$(python -c "import secrets;print(secrets.token_hex(32))") uvicorn ap
 
 Open http://localhost:8000 and sign in with the admin email and the temporary password printed by the seed script.
 
-Run the tests with `pytest`. They use a synthetic workbook, so no organisational data is needed.
+Run the tests with `pip install -r requirements-dev.txt && pytest`. They use a synthetic workbook, so no organisational data is needed.
 
 ## Documentation
 
-- [User guide](docs/user-guide.md): employees, managers and calibration owners
-- [Administrator guide](docs/admin-guide.md): setup, editing the framework, onboarding new teams, imports and exports
+- **[User guide](docs/guide/README.md)**, also in the app under **Help**: role-based guides with screenshots for employees, managers, calibration owners and administrators
+- [Administrator setup guide](docs/admin-guide.md): installation, seeding, editing the framework, onboarding, backups
+- [Keeping the guide up to date](docs/guide/MAINTAINING.md)
 - [Assessment and gap rules](docs/assessment-rules.md): scale, workflow, formulas, statuses, evidence rules (R01–R20)
 - [Architecture and deployment](docs/architecture.md): data model, permissions, configuration, security, roadmap
 
@@ -62,8 +63,9 @@ app/
   templates/       Server-rendered Jinja2 pages
   static/          CSS and a small progressive-enhancement script
 scripts/seed.py    Initialise DB from the workbook, create admin, optional demo data
+scripts/screenshots.py  Regenerate user-guide screenshots from fictional demo data
 tests/             Unit tests for the rules + end-to-end workflow tests
-docs/              Documentation
+docs/              Documentation; docs/guide/ = user guide (served in-app at /help)
 ```
 
 ## Data protection

@@ -20,8 +20,11 @@
     {% endif %}
     <a href="/framework" class="{{ 'on' if p.startswith('/framework') }}">Framework</a>
     {% if me.is_admin %}<a href="/admin" class="{{ 'on' if p.startswith('/admin') }}">Admin</a>{% endif %}
+    <a href="/help" class="{{ 'on' if p.startswith('/help') }}">Help</a>
   </nav>
   <div class="who">{{ me.name }} · <a href="/password">Password</a> · <a href="/logout">Sign out</a></div>
+  {% else %}
+  <nav aria-label="Main"><a href="/help">Help</a></nav>
   {% endif %}
 </div></header>
 <main>

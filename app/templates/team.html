@@ -1,6 +1,6 @@
-{% extends "base.html" %}{% from "macros.html" import wf %}{% block title %}Team reviews{% endblock %}
+{% extends "base.html" %}{% from "macros.html" import wf, help %}{% block title %}Team reviews{% endblock %}
 {% block content %}
-<div class="section-head"><h1>Team reviews</h1>
+<div class="section-head"><h1>Team reviews {{ help("manager#your-team-reviews-page", "Manager guide") }}</h1>
 <form method="get" class="actions" style="margin:0"><select name="cycle_id" onchange="this.form.submit()" aria-label="Cycle">
 {% for c in cycles %}<option value="{{ c.id }}" {{ 'selected' if cycle and c.id == cycle.id }}>{{ c.name }}{{ ' (active)' if c.active }}</option>{% endfor %}</select></form></div>
 <div class="table-wrap"><table>

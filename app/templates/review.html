@@ -1,4 +1,4 @@
-{% extends "base.html" %}{% from "macros.html" import chip, wf, lv %}{% block title %}Review{% endblock %}
+{% extends "base.html" %}{% from "macros.html" import chip, wf, lv, help %}{% block title %}Review{% endblock %}
 {% block content %}
 {% set reviewing = may_review and a.status in ['Submitted', 'Manager Review'] %}
 {% set calibrating = may_calibrate and a.status == 'Calibration' %}
@@ -9,8 +9,8 @@
 </div>
 {% if not a.role.is_validated %}<div class="banner"><b>Role requirements not yet validated</b> ({{ a.role.validation_status }}). Confirm the required levels with team management before treating gaps as final.</div>{% endif %}
 {% if a.status == 'Draft' %}<div class="flash info">The employee is still working on the self-assessment.</div>{% endif %}
-{% if reviewing %}<div class="flash info"><b>Step: manager review.</b> Review the self-rating and evidence, then select your evidence-based level for each area. A comment is required where your level differs from the self level. Do not average.</div>{% endif %}
-{% if calibrating %}<div class="flash info"><b>Step: calibration.</b> Set the <i>validated current level</i>, a whole number agreed after review/calibration. It becomes the official level for the development gap. Then finalise.</div>{% endif %}
+{% if reviewing %}<div class="flash info"><b>Step: manager review.</b> Review the self-rating and evidence, then select your evidence-based level for each area. A comment is required where your level differs from the self level. Do not average. {{ help("manager#step-1-review-the-self-assessment", "How to review") }}</div>{% endif %}
+{% if calibrating %}<div class="flash info"><b>Step: calibration.</b> Set the <i>validated current level</i>, a whole number agreed after review/calibration. It becomes the official level for the development gap. Then finalise. {{ help("manager#step-2-calibrate-and-finalise", "How to calibrate and finalise") }}</div>{% endif %}
 
 <form method="post" action="/review/{{ a.id }}">
 <div class="table-wrap"><table>

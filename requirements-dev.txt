@@ -1,0 +1,6 @@
+-r requirements.txt
+# tests
+httpx>=0.27
+pytest>=8
+# user-guide screenshots (python -m scripts.screenshots)
+playwright>=1.45

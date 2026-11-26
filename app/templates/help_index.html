@@ -1,0 +1,16 @@
+{% extends "base.html" %}{% block title %}Help{% endblock %}
+{% block content %}
+<h1>Help &amp; user guide</h1>
+<p class="muted">Step-by-step guides for each role. Start with <a href="/help/getting-started">Getting started</a>, then open the guide for your role.{% if me %} Guides for your role(s) are highlighted.{% endif %}</p>
+<div class="grid help-cards">
+{% for slug, title, who, desc in pages %}
+  <a class="card help-card{{ ' mine' if slug in mine }}" href="/help/{{ slug }}">
+    {% if slug in mine and me %}<span class="chip meets">For you</span>{% endif %}
+    <h3>{{ title }}</h3>
+    <div class="small muted">{{ who }}</div>
+    <p class="small">{{ desc }}</p>
+  </a>
+{% endfor %}
+</div>
+<div class="card small muted">Can't find an answer? Contact your application administrator. Something in the app looks different from these pages? Let the administrator know so the guide can be updated.</div>
+{% endblock %}

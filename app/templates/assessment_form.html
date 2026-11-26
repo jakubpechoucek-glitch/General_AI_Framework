@@ -1,4 +1,4 @@
-{% extends "base.html" %}{% block title %}Self-assessment{% endblock %}
+{% extends "base.html" %}{% from "macros.html" import help %}{% block title %}Self-assessment{% endblock %}
 {% block content %}
 <div class="section-head">
   <div><h1>Self-assessment · {{ a.cycle.name }}</h1>
@@ -11,6 +11,7 @@
   Choose the level that best describes what you <b>do today</b>, not what your role requires. Your role requirement is shown only after you submit, so it does not anchor your rating.
   Evidence is required for levels 2–4 (one work example for L2, several examples or a complex output for L3, standard-setting or organisational impact for L4).
   You can save a draft at any time.
+  <div style="margin-top:.4rem">{{ help("employee#step-2-rate-your-current-level", "How to choose the right level") }} &nbsp; {{ help("employee#step-3-add-evidence", "What counts as evidence?") }}</div>
 </div>
 <form method="post" action="/assessment/{{ a.id }}" id="selfform">
 {% for type in ['Knowledge', 'Skill', 'Competency'] %}

@@ -1,6 +1,6 @@
-{% extends "base.html" %}{% from "macros.html" import wf, bar, legend %}{% block title %}Gap reports{% endblock %}
+{% extends "base.html" %}{% from "macros.html" import wf, bar, legend, help %}{% block title %}Gap reports{% endblock %}
 {% block content %}
-<div class="section-head"><h1>Gap reports</h1>
+<div class="section-head"><h1>Gap reports {{ help("manager#using-the-gap-reports", "How to read the reports") }}</h1>
 <form method="get" class="actions" style="margin:0">
 {% if teams %}<select name="team_id" aria-label="Team"><option value="">All teams</option>{% for t in teams %}<option value="{{ t.id }}" {{ 'selected' if team_id == t.id }}>{{ t.name }}</option>{% endfor %}</select>{% endif %}
 <select name="cycle_id" aria-label="Cycle">{% for c in cycles %}<option value="{{ c.id }}" {{ 'selected' if cycle and c.id == cycle.id }}>{{ c.name }}</option>{% endfor %}</select>

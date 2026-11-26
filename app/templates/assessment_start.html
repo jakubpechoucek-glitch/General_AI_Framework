@@ -1,4 +1,4 @@
-{% extends "base.html" %}{% block title %}Start{% endblock %}
+{% extends "base.html" %}{% from "macros.html" import help %}{% block title %}Start{% endblock %}
 {% block content %}
 <h1>AI self-assessment{% if cycle %} · {{ cycle.name }}{% endif %}</h1>
 {% if not cycle %}
@@ -7,7 +7,7 @@
 <div class="card">No role is assigned to you yet. Please contact the administrator.</div>
 {% else %}
 <div class="card">
-  <h2 style="margin-top:0">Step 1 · Confirm your role</h2>
+  <div class="section-head"><h2 style="margin-top:0">Step 1 · Confirm your role</h2>{{ help("employee#step-1-confirm-your-role", "Why do I confirm my role?") }}</div>
   <p>The areas you are asked about depend on your role. Please check that this is correct:</p>
   <p style="font-size:1.1rem"><b>{{ me.role.title }}</b><br><span class="muted">{{ me.role.family }} · {{ me.team.name if me.team }}</span></p>
   <form method="post" action="/assessment/start">

@@ -10,7 +10,7 @@ from starlette.middleware.sessions import SessionMiddleware
 
 from .auth import Forbidden, LoginRequired
 from .db import init_db
-from .routes import admin, core, review
+from .routes import admin, core, help as help_routes, review
 from .web import redirect, render
 
 SECRET_KEY = os.environ.get("SECRET_KEY") or secrets.token_hex(32)
@@ -27,9 +27,11 @@ app = FastAPI(title="AI KSC Self-Assessment", docs_url=None, redoc_url=None, lif
 app.add_middleware(SessionMiddleware, secret_key=SECRET_KEY, same_site="strict",
                    https_only=os.environ.get("HTTPS_ONLY", "0") == "1", max_age=8 * 3600)
 app.mount("/static", StaticFiles(directory=str(Path(__file__).parent / "static")), name="static")
+app.mount("/help/img", StaticFiles(directory=str(help_routes.GUIDE_DIR / "img")), name="help-img")
 app.include_router(core.router)
 app.include_router(review.router)
 app.include_router(admin.router)
+app.include_router(help_routes.router)
 
 
 @app.exception_handler(LoginRequired)
